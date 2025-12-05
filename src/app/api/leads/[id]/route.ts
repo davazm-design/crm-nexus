@@ -1,48 +1,32 @@
-import { NextResponse } from 'next/server';
-import { updateLead, deleteLead } from '@/lib/db';
-import { updateLeadSchema } from '@/lib/validations';
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
 
-export async function PATCH(
-    request: Request,
+// GET: Obtener un lead por ID con su historial de mensajes
+export async function GET(
+    request: NextRequest,
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const { id } = await params;
-        const body = await request.json();
 
-        // Validate input
-        const validation = updateLeadSchema.safeParse(body);
-        if (!validation.success) {
+        const lead = await prisma.lead.findUnique({
+            where: { id },
+            include: { history: true },
+        });
+
+        if (!lead) {
             return NextResponse.json(
-                { error: 'Validation Error', details: validation.error.format() },
-                { status: 400 }
+                { error: 'Lead no encontrado' },
+                { status: 404 }
             );
         }
 
-        const updatedLead = await updateLead(id, validation.data as any);
-
-        if (!updatedLead) {
-            return NextResponse.json({ error: 'Lead not found' }, { status: 404 });
-        }
-
-        return NextResponse.json(updatedLead);
-    } catch (error) {
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
-    }
-}
-
-export async function DELETE(
-    request: Request,
-    { params }: { params: Promise<{ id: string }> }
-) {
-    try {
-        const { id } = await params;
-        const success = await deleteLead(id);
-        if (!success) {
-            return NextResponse.json({ error: 'Lead not found' }, { status: 404 });
-        }
-        return NextResponse.json({ success: true });
-    } catch (error) {
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+        return NextResponse.json(lead);
+    } catch (error: any) {
+        console.error('Error fetching lead:', error);
+        return NextResponse.json(
+            { error: 'Error interno del servidor' },
+            { status: 500 }
+        );
     }
 }
