@@ -1,0 +1,79 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enums para mantener consistencia con nuestros tipos de TS
+enum LeadStatus {
+  new
+  cleaned
+  contacted
+  in_conversation
+  scheduled
+  no_show
+  rescheduled
+  enrolled
+  not_enrolled
+}
+
+enum LeadPriority {
+  hot
+  warm
+  cold
+}
+
+enum MessageSender {
+  executive
+  prospect
+}
+
+// Modelo principal de Lead
+model Lead {
+  id            String    @id @default(uuid())
+  name          String
+  phone         String
+  email         String?   // Opcional según nuestra validación actual
+  source        String    // Código de fuente (01-07)
+  
+  // Metadatos de negocio
+  businessUnit  String?   // ID de la unidad (beeplay, etc.)
+  priority      LeadPriority? @default(warm)
+  interestCycle String?   // "Enero 2025", etc.
+  
+  status        LeadStatus @default(new)
+  
+  // Fechas importantes
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  scheduledAt   DateTime?
+  
+  // Datos no estructurados o arrays simples
+  tags          String[]  // PostgreSQL soporta arrays nativos
+  observations  String?   @db.Text
+  
+  // Relaciones
+  history       Message[] // Relación 1:N con mensajes
+  
+  @@map("leads") // Nombre de la tabla en la BD
+}
+
+// Tabla separada para el historial de mensajes (Normalización)
+model Message {
+  id        String   @id @default(uuid())
+  content   String   @db.Text
+  sender    MessageSender
+  timestamp DateTime @default(now())
+  
+  // Relación con Lead
+  leadId    String
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  
+  @@map("messages")
+}

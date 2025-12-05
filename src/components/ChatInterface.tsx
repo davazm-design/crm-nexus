@@ -1,0 +1,237 @@
+'use client';
+
+import { useState, useEffect, useRef } from 'react';
+import { Lead, Message } from '@/types';
+import { Send, User, Bot, Phone, Search, MoreVertical, Paperclip, Smile } from 'lucide-react';
+import clsx from 'clsx';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
+
+export function ChatInterface() {
+    const [leads, setLeads] = useState<Lead[]>([]);
+    const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
+    const [message, setMessage] = useState('');
+    const [sender, setSender] = useState<'executive' | 'prospect'>('executive');
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        fetch('/api/leads')
+            .then((res) => res.json())
+            .then(setLeads);
+    }, []);
+
+    const selectedLead = leads.find((l) => l.id === selectedLeadId);
+
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [selectedLead?.history]);
+
+    const handleSendMessage = async () => {
+        if (!message.trim() || !selectedLead) return;
+
+        const newMessage: Message = {
+            id: crypto.randomUUID(),
+            sender,
+            content: message,
+            timestamp: new Date().toISOString(),
+        };
+
+        const updatedHistory = [...selectedLead.history, newMessage];
+
+        // Optimistic update
+        setLeads(prev => prev.map(l =>
+            l.id === selectedLead.id ? { ...l, history: updatedHistory } : l
+        ));
+
+        setMessage('');
+
+        // API call
+        try {
+            await fetch(`/api/leads/${selectedLead.id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ history: updatedHistory }),
+            });
+        } catch (error) {
+            console.error('Failed to send message', error);
+        }
+    };
+
+    return (
+        <div className="flex h-[calc(100vh-10rem)] glass rounded-2xl overflow-hidden shadow-2xl shadow-black/50">
+            {/* Sidebar List */}
+            <div className="w-80 border-r border-white/5 flex flex-col bg-slate-900/50 backdrop-blur-md">
+                <div className="p-4 border-b border-white/5">
+                    <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                        <input
+                            type="text"
+                            placeholder="Buscar conversación..."
+                            className="w-full bg-slate-800/50 border border-slate-700/50 rounded-xl pl-10 pr-4 py-2 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 placeholder:text-slate-500"
+                        />
+                    </div>
+                </div>
+                <div className="flex-1 overflow-y-auto custom-scrollbar">
+                    {leads.map((lead) => (
+                        <div
+                            key={lead.id}
+                            onClick={() => setSelectedLeadId(lead.id)}
+                            className={clsx(
+                                'p-4 border-b border-white/5 cursor-pointer hover:bg-white/5 transition-all duration-200',
+                                selectedLeadId === lead.id ? 'bg-blue-600/10 border-l-2 border-l-blue-500' : 'border-l-2 border-l-transparent'
+                            )}
+                        >
+                            <div className="flex justify-between items-start mb-1">
+                                <span className={clsx("font-medium text-sm", selectedLeadId === lead.id ? "text-blue-400" : "text-slate-200")}>
+                                    {lead.name}
+                                </span>
+                                {lead.history.length > 0 && (
+                                    <span className="text-[10px] text-slate-500">
+                                        {format(new Date(lead.history[lead.history.length - 1].timestamp), 'HH:mm')}
+                                    </span>
+                                )}
+                            </div>
+                            <div className="text-xs text-slate-400 truncate pr-2">
+                                {lead.history.length > 0
+                                    ? lead.history[lead.history.length - 1].content
+                                    : <span className="italic opacity-50">Sin mensajes previos</span>}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Chat Area */}
+            <div className="flex-1 flex flex-col bg-slate-950/30 relative">
+                {/* Chat Background Pattern */}
+                <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#4f46e5 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
+
+                {selectedLead ? (
+                    <>
+                        {/* Header */}
+                        <div className="p-4 border-b border-white/5 bg-slate-900/50 backdrop-blur-md flex justify-between items-center z-10">
+                            <div className="flex items-center gap-3">
+                                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold shadow-lg shadow-blue-500/20">
+                                    {selectedLead.name.charAt(0)}
+                                </div>
+                                <div>
+                                    <h3 className="font-bold text-white text-sm">{selectedLead.name}</h3>
+                                    <div className="flex items-center gap-2 text-xs text-slate-400">
+                                        <Phone className="h-3 w-3" /> {selectedLead.phone}
+                                        <span className="w-1 h-1 rounded-full bg-slate-600"></span>
+                                        <span className="text-emerald-400">En línea</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button className="p-2 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
+                                <MoreVertical className="h-5 w-5" />
+                            </button>
+                        </div>
+
+                        {/* Messages */}
+                        <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar z-0">
+                            {selectedLead.history.map((msg, index) => {
+                                const isExecutive = msg.sender === 'executive';
+                                return (
+                                    <div
+                                        key={msg.id}
+                                        className={clsx(
+                                            'flex w-full',
+                                            isExecutive ? 'justify-end' : 'justify-start'
+                                        )}
+                                    >
+                                        <div className={clsx("flex flex-col max-w-[70%]", isExecutive ? "items-end" : "items-start")}>
+                                            <div
+                                                className={clsx(
+                                                    'rounded-2xl p-4 text-sm shadow-md relative',
+                                                    isExecutive
+                                                        ? 'bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-tr-none'
+                                                        : 'bg-slate-800 text-slate-200 rounded-tl-none border border-white/5'
+                                                )}
+                                            >
+                                                <p className="leading-relaxed">{msg.content}</p>
+                                            </div>
+                                            <span className="text-[10px] text-slate-500 mt-1 px-1">
+                                                {format(new Date(msg.timestamp), 'HH:mm')}
+                                            </span>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                            <div ref={messagesEndRef} />
+                        </div>
+
+                        {/* Input Area */}
+                        <div className="p-4 border-t border-white/5 bg-slate-900/50 backdrop-blur-md z-10">
+                            <div className="flex items-center gap-2 mb-3">
+                                <span className="text-xs text-slate-500 font-medium uppercase tracking-wider mr-2">Simular como:</span>
+                                <button
+                                    onClick={() => setSender('executive')}
+                                    className={clsx(
+                                        "text-xs px-3 py-1 rounded-full transition-all",
+                                        sender === 'executive'
+                                            ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                                            : 'bg-slate-800 text-slate-400 border border-transparent hover:bg-slate-700'
+                                    )}
+                                >
+                                    Ejecutivo
+                                </button>
+                                <button
+                                    onClick={() => setSender('prospect')}
+                                    className={clsx(
+                                        "text-xs px-3 py-1 rounded-full transition-all",
+                                        sender === 'prospect'
+                                            ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                                            : 'bg-slate-800 text-slate-400 border border-transparent hover:bg-slate-700'
+                                    )}
+                                >
+                                    Prospecto
+                                </button>
+                            </div>
+                            <div className="flex items-end gap-2 bg-slate-800/50 border border-slate-700/50 rounded-xl p-2">
+                                <button className="p-2 text-slate-400 hover:text-blue-400 transition-colors">
+                                    <Smile className="h-5 w-5" />
+                                </button>
+                                <button className="p-2 text-slate-400 hover:text-blue-400 transition-colors">
+                                    <Paperclip className="h-5 w-5" />
+                                </button>
+                                <textarea
+                                    value={message}
+                                    onChange={(e) => setMessage(e.target.value)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' && !e.shiftKey) {
+                                            e.preventDefault();
+                                            handleSendMessage();
+                                        }
+                                    }}
+                                    placeholder="Escribe un mensaje..."
+                                    className="flex-1 bg-transparent border-none text-white placeholder:text-slate-500 focus:ring-0 resize-none max-h-32 py-2 text-sm custom-scrollbar"
+                                    rows={1}
+                                />
+                                <button
+                                    onClick={handleSendMessage}
+                                    disabled={!message.trim()}
+                                    className="p-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-600/20"
+                                >
+                                    <Send className="h-5 w-5" />
+                                </button>
+                            </div>
+                        </div>
+                    </>
+                ) : (
+                    <div className="flex-1 flex flex-col items-center justify-center text-slate-500">
+                        <div className="h-20 w-20 rounded-full bg-slate-800/50 flex items-center justify-center mb-4 animate-pulse">
+                            <Search className="h-8 w-8 text-slate-600" />
+                        </div>
+                        <p className="text-lg font-medium text-slate-400">Selecciona una conversación</p>
+                        <p className="text-sm text-slate-600">Para ver el historial de mensajes</p>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}
