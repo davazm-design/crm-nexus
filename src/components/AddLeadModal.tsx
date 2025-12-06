@@ -70,8 +70,8 @@ export function AddLeadModal({ isOpen, onClose, onSave, initialData }: AddLeadMo
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4">
-            <div className="w-full max-w-lg max-h-[90vh] rounded-2xl bg-slate-900/90 border border-white/10 shadow-2xl shadow-black/50 overflow-hidden transform transition-all scale-100 flex flex-col">
+        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/60 backdrop-blur-md p-4 pb-20 lg:pb-4">
+            <div className="w-full max-w-lg max-h-[85vh] lg:max-h-[90vh] rounded-2xl bg-slate-900/95 border border-white/10 shadow-2xl shadow-black/50 overflow-hidden transform transition-all scale-100 flex flex-col">
                 <div className="relative p-6 border-b border-white/5 bg-gradient-to-r from-blue-600/20 to-indigo-600/20 flex-shrink-0">
                     <h3 className="text-xl font-bold text-white font-outfit">
                         {initialData ? 'Editar Prospecto' : 'Nuevo Prospecto'}
