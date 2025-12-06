@@ -429,6 +429,17 @@ export function MobileCalendar({ }: MobileCalendarProps) {
                     )}
                 </div>
             </div>
+
+            {/* FAB para agregar cita rápida */}
+            <button
+                onClick={() => {
+                    setSelectedDate(new Date());
+                    setShowScheduleModal(true);
+                }}
+                className="fixed bottom-20 right-4 p-4 bg-blue-600 text-white rounded-full shadow-lg shadow-blue-600/30 active:bg-blue-500 z-20 flex items-center gap-2"
+            >
+                <Plus className="h-6 w-6" />
+            </button>
         </PullToRefresh>
     );
 }
