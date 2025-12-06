@@ -43,10 +43,10 @@ function formatPhoneForWhatsApp(phone: string): string {
  * @param message - Contenido del mensaje
  * @returns El SID del mensaje enviado o null si hubo error
  */
-export async function sendWhatsAppMessage(to: string, message: string): Promise<string | null> {
+export async function sendWhatsAppMessage(to: string, message: string): Promise<{ sid: string } | { error: string, code?: number }> {
     if (!client) {
         console.error('Twilio client not initialized. Check your credentials.');
-        return null;
+        return { error: 'Twilio no está configurado' };
     }
 
     try {
@@ -62,11 +62,27 @@ export async function sendWhatsAppMessage(to: string, message: string): Promise<
             body: message,
         });
 
-        console.log(`✅ WhatsApp message sent. SID: ${result.sid}`);
-        return result.sid;
+        console.log(`✅ WhatsApp message sent. SID: ${result.sid}, Status: ${result.status}`);
+        return { sid: result.sid };
     } catch (error: any) {
-        console.error('❌ Error sending WhatsApp message:', error.message);
-        return null;
+        const twilioCode = error.code || 'unknown';
+        const twilioMessage = error.message || 'Error desconocido';
+
+        console.error(`❌ Error sending WhatsApp [${twilioCode}]:`, twilioMessage);
+
+        // Mensajes de error específicos para el usuario
+        let userMessage = twilioMessage;
+        if (twilioCode === 21408) {
+            userMessage = 'El destinatario no se ha unido al Sandbox de Twilio. Debe enviar "join citizen-equipment" al +1 415 523 8886 primero.';
+        } else if (twilioCode === 21610) {
+            userMessage = 'El mensaje fue bloqueado por spam.';
+        } else if (twilioCode === 21617) {
+            userMessage = 'El número de destino no está registrado en WhatsApp.';
+        } else if (twilioCode === 63016) {
+            userMessage = 'Han pasado más de 24 horas desde el último mensaje del usuario. Necesitas usar una plantilla aprobada.';
+        }
+
+        return { error: userMessage, code: twilioCode };
     }
 }
 

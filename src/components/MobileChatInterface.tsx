@@ -255,7 +255,7 @@ export function MobileChatInterface() {
             </div>
 
             {/* Input FIJO en la parte inferior - sobre el BottomTabBar */}
-            <div className="flex-shrink-0 p-3 bg-slate-900 border-t border-white/10 mb-14 safe-area-bottom">
+            <div className="flex-shrink-0 p-2 px-3 bg-slate-900 border-t border-white/10 pb-16">
                 {sendError && (
                     <div className="mb-2 p-2 bg-red-500/20 border border-red-500/50 rounded-lg text-xs text-red-300">
                         {sendError}
@@ -268,13 +268,18 @@ export function MobileChatInterface() {
                         onChange={(e) => setMessage(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
                         placeholder="Escribe un mensaje..."
-                        className="flex-1 bg-slate-800 border border-slate-700/50 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                        autoComplete="off"
+                        autoCorrect="off"
+                        autoCapitalize="sentences"
+                        spellCheck="false"
+                        data-form-type="other"
+                        className="mobile-chat-input flex-1 min-w-0 bg-slate-800 border border-slate-700/50 rounded-xl px-4 py-2.5 text-base text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                     />
                     <button
                         onClick={handleSendMessage}
                         disabled={sending || !message.trim()}
                         className={clsx(
-                            "p-3 rounded-xl text-white transition-all flex-shrink-0",
+                            "p-2.5 rounded-xl text-white transition-all flex-shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center",
                             sending || !message.trim()
                                 ? 'bg-slate-700 text-slate-400'
                                 : 'bg-blue-600 hover:bg-blue-500 active:scale-95'

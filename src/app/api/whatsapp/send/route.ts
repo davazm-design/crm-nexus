@@ -52,12 +52,13 @@ export async function POST(request: NextRequest) {
         }
 
         // Enviar mensaje por WhatsApp
-        const messageSid = await sendWhatsAppMessage(lead.phone, message);
+        const result = await sendWhatsAppMessage(lead.phone, message);
 
-        if (!messageSid) {
+        // Verificar si hubo error
+        if ('error' in result) {
             return NextResponse.json(
-                { error: 'Error al enviar el mensaje. Verifica que el número esté registrado en el Sandbox.' },
-                { status: 500 }
+                { error: result.error, code: result.code },
+                { status: 400 }
             );
         }
 
@@ -73,7 +74,7 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json({
             success: true,
-            messageSid: messageSid,
+            messageSid: result.sid,
             savedMessage: savedMessage,
         });
 
