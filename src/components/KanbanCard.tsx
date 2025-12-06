@@ -3,7 +3,7 @@ import { memo } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Lead } from '@/types';
-import { Phone, Calendar, MoreHorizontal, Building2, CalendarClock } from 'lucide-react';
+import { Phone, Calendar, MoreHorizontal, Building2, CalendarClock, MessageCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { getBusinessUnit } from '@/lib/businessUnits';
 import clsx from 'clsx';
@@ -43,8 +43,16 @@ export function KanbanCard({ lead, onEdit }: KanbanCardProps) {
         >
             <div className="flex justify-between items-start mb-3">
                 <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold shadow-lg shadow-blue-500/20">
-                        {lead.name.charAt(0)}
+                    <div className="relative">
+                        <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold shadow-lg shadow-blue-500/20">
+                            {lead.name.charAt(0)}
+                        </div>
+                        {/* Badge de mensaje nuevo */}
+                        {lead.hasUnreadMessages && (
+                            <div className="absolute -top-1 -right-1 h-4 w-4 bg-green-500 rounded-full flex items-center justify-center animate-pulse ring-2 ring-slate-800" title="Nuevo mensaje">
+                                <MessageCircle className="h-2.5 w-2.5 text-white" />
+                            </div>
+                        )}
                     </div>
                     <div>
                         <div

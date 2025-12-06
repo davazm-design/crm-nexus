@@ -45,6 +45,7 @@ export interface Lead {
     tags: string[];
     observations: string;
     history: Message[];
+    hasUnreadMessages?: boolean; // True cuando hay mensajes de WhatsApp sin leer
 }
 
 export interface Settings {

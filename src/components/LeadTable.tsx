@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { Lead, LeadStatus, LeadPriority } from '@/types';
 import { StatusBadge } from './StatusBadge';
-import { MoreHorizontal, Phone, Mail, Calendar, Search, Filter, Download, Trash2, Edit, X, Flame, Zap, Snowflake, Users, Plus } from 'lucide-react';
+import { MoreHorizontal, Phone, Mail, Calendar, Search, Filter, Download, Trash2, Edit, X, Flame, Zap, Snowflake, Users, Plus, MessageCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import clsx from 'clsx';
@@ -580,8 +580,16 @@ export function LeadTable() {
                                             </td>
                                             <td className="px-2 py-4 whitespace-nowrap border-r border-white/10 overflow-hidden max-w-0">
                                                 <div className="flex items-center">
-                                                    <div className="h-10 w-10 flex-shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold shadow-lg shadow-blue-500/20">
-                                                        {lead.name.charAt(0)}
+                                                    <div className="relative">
+                                                        <div className="h-10 w-10 flex-shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold shadow-lg shadow-blue-500/20">
+                                                            {lead.name.charAt(0)}
+                                                        </div>
+                                                        {/* Badge de mensaje nuevo */}
+                                                        {lead.hasUnreadMessages && (
+                                                            <div className="absolute -top-1 -right-1 h-5 w-5 bg-green-500 rounded-full flex items-center justify-center animate-pulse ring-2 ring-slate-900" title="Nuevo mensaje de WhatsApp">
+                                                                <MessageCircle className="h-3 w-3 text-white" />
+                                                            </div>
+                                                        )}
                                                     </div>
                                                     <div className="ml-4 min-w-0 flex-1">
                                                         <div

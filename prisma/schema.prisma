@@ -59,6 +59,9 @@ model Lead {
   tags          String[]  // PostgreSQL soporta arrays nativos
   observations  String?   @db.Text
   
+  // WhatsApp tracking
+  hasUnreadMessages Boolean @default(false) // True cuando hay mensajes del prospecto sin leer
+  
   // Relaciones
   history       Message[] // Relación 1:N con mensajes
   

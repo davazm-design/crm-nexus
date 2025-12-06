@@ -47,7 +47,14 @@ export async function POST(request: NextRequest) {
                     timestamp: new Date(),
                 },
             });
-            console.log(`✅ Message saved to lead ${lead.id}`);
+
+            // Marcar el lead como con mensajes sin leer
+            await prisma.lead.update({
+                where: { id: lead.id },
+                data: { hasUnreadMessages: true },
+            });
+
+            console.log(`✅ Message saved to lead ${lead.id} (marked as unread)`);
         } else {
             console.log(`⚠️ No lead found for phone ${phoneNumber}. Message not saved.`);
             // Opcionalmente, podrías crear un lead nuevo automáticamente aquí

@@ -32,6 +32,30 @@ export function ChatInterface() {
         scrollToBottom();
     }, [selectedLead?.history]);
 
+    // Marcar mensajes como leídos cuando se selecciona un lead
+    const markAsRead = async (leadId: string) => {
+        try {
+            await fetch('/api/whatsapp/mark-read', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ leadId }),
+            });
+            // Actualizar estado local
+            setLeads(prev => prev.map(l =>
+                l.id === leadId ? { ...l, hasUnreadMessages: false } : l
+            ));
+        } catch (error) {
+            console.error('Error marking as read:', error);
+        }
+    };
+
+    // Cuando se selecciona un lead con mensajes sin leer, marcarlos como leídos
+    useEffect(() => {
+        if (selectedLead?.hasUnreadMessages) {
+            markAsRead(selectedLead.id);
+        }
+    }, [selectedLeadId]);
+
     // Polling para nuevos mensajes (cada 5 segundos)
     useEffect(() => {
         if (!selectedLeadId) return;
