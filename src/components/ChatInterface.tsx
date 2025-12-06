@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Lead, Message } from '@/types';
-import { Send, User, Bot, Phone, Search, MoreVertical, Paperclip, Smile } from 'lucide-react';
+import { Send, User, Bot, Phone, PhoneCall, Search, MoreVertical, Paperclip, Smile } from 'lucide-react';
 import clsx from 'clsx';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -201,15 +201,31 @@ export function ChatInterface() {
                                 <div>
                                     <h3 className="font-bold text-white text-sm">{selectedLead.name}</h3>
                                     <div className="flex items-center gap-2 text-xs text-slate-400">
-                                        <Phone className="h-3 w-3" /> {selectedLead.phone}
+                                        <a
+                                            href={`tel:+52${selectedLead.phone}`}
+                                            className="flex items-center gap-1 hover:text-green-400 transition-colors"
+                                            title="Llamar"
+                                        >
+                                            <Phone className="h-3 w-3" /> {selectedLead.phone}
+                                        </a>
                                         <span className="w-1 h-1 rounded-full bg-slate-600"></span>
                                         <span className="text-emerald-400">En línea</span>
                                     </div>
                                 </div>
                             </div>
-                            <button className="p-2 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
-                                <MoreVertical className="h-5 w-5" />
-                            </button>
+                            <div className="flex items-center gap-2">
+                                {/* Botón de llamar */}
+                                <a
+                                    href={`tel:+52${selectedLead.phone}`}
+                                    className="p-2 text-green-400 hover:text-white hover:bg-green-600 rounded-lg transition-colors"
+                                    title="Llamar a este prospecto"
+                                >
+                                    <PhoneCall className="h-5 w-5" />
+                                </a>
+                                <button className="p-2 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
+                                    <MoreVertical className="h-5 w-5" />
+                                </button>
+                            </div>
                         </div>
 
                         {/* Messages */}

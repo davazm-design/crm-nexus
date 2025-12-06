@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, User, Phone, Mail, Globe, FileText, Flame, Zap, Snowflake, Calendar, Building2 } from 'lucide-react';
+import { X, User, Phone, PhoneCall, Mail, Globe, FileText, Flame, Zap, Snowflake, Calendar, Building2 } from 'lucide-react';
 import { Lead, LeadPriority, InterestCycle, BusinessUnitId } from '@/types';
 import { getBusinessUnitOptions } from '@/lib/businessUnits';
 import { getSourceOptions } from '@/lib/sources';
@@ -108,22 +108,34 @@ export function AddLeadModal({ isOpen, onClose, onSave, initialData }: AddLeadMo
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="group">
                                     <label className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wider">Teléfono</label>
-                                    <div className="relative">
-                                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 group-focus-within:text-blue-400 transition-colors" />
-                                        <input
-                                            type="tel"
-                                            required
-                                            value={formData.phone}
-                                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                            className="w-full bg-slate-800/50 border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
-                                            placeholder="55 1234 5678"
-                                            maxLength={10}
-                                            onInput={(e) => {
-                                                e.currentTarget.value = e.currentTarget.value.replace(/\D/g, '').slice(0, 10);
-                                                setFormData({ ...formData, phone: e.currentTarget.value });
-                                                setError(null);
-                                            }}
-                                        />
+                                    <div className="relative flex gap-2">
+                                        <div className="relative flex-1">
+                                            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 group-focus-within:text-blue-400 transition-colors" />
+                                            <input
+                                                type="tel"
+                                                required
+                                                value={formData.phone}
+                                                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                                className="w-full bg-slate-800/50 border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+                                                placeholder="55 1234 5678"
+                                                maxLength={10}
+                                                onInput={(e) => {
+                                                    e.currentTarget.value = e.currentTarget.value.replace(/\D/g, '').slice(0, 10);
+                                                    setFormData({ ...formData, phone: e.currentTarget.value });
+                                                    setError(null);
+                                                }}
+                                            />
+                                        </div>
+                                        {/* Botón de llamar - solo visible al editar */}
+                                        {initialData && formData.phone && (
+                                            <a
+                                                href={`tel:+52${formData.phone}`}
+                                                className="flex items-center justify-center w-11 h-11 bg-green-600 hover:bg-green-500 text-white rounded-xl transition-colors shadow-lg shadow-green-600/20"
+                                                title="Llamar a este número"
+                                            >
+                                                <PhoneCall className="h-5 w-5" />
+                                            </a>
+                                        )}
                                     </div>
                                 </div>
                                 <div className="group">

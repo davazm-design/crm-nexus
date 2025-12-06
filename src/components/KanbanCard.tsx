@@ -3,7 +3,7 @@ import { memo } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Lead } from '@/types';
-import { Phone, Calendar, MoreHorizontal, Building2, CalendarClock, MessageCircle } from 'lucide-react';
+import { Phone, PhoneCall, Calendar, MoreHorizontal, Building2, CalendarClock, MessageCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { getBusinessUnit } from '@/lib/businessUnits';
 import clsx from 'clsx';
@@ -84,9 +84,17 @@ export function KanbanCard({ lead, onEdit }: KanbanCardProps) {
             </div>
 
             <div className="space-y-2">
-                <div className="text-xs text-slate-400 flex items-center gap-2 bg-slate-900/50 p-2 rounded-lg border border-white/5">
-                    <Phone className="h-3 w-3 text-slate-500" /> {lead.phone}
-                </div>
+                <a
+                    href={`tel:+52${lead.phone}`}
+                    className="text-xs text-slate-400 flex items-center gap-2 bg-slate-900/50 p-2 rounded-lg border border-white/5 hover:border-green-500/30 hover:bg-green-500/10 transition-all group/phone"
+                    onPointerDown={(e) => e.stopPropagation()}
+                    onClick={(e) => e.stopPropagation()}
+                    title="Llamar a este número"
+                >
+                    <Phone className="h-3 w-3 text-slate-500 group-hover/phone:text-green-400 transition-colors" />
+                    <span className="flex-1">{lead.phone}</span>
+                    <PhoneCall className="h-3 w-3 text-green-400 opacity-0 group-hover/phone:opacity-100 transition-opacity" />
+                </a>
 
                 {/* Business Unit & Interest Cycle */}
                 {(businessUnit || lead.interestCycle) && (
