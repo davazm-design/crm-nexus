@@ -1,6 +1,18 @@
+'use client';
+
 import { KanbanBoard } from '@/components/KanbanBoard';
+import { MobileKanban } from '@/components/MobileKanban';
+import { useMobile } from '@/components/MobileProvider';
 
 export default function KanbanPage() {
+    const { isMobile } = useMobile();
+
+    // Vista móvil optimizada
+    if (isMobile) {
+        return <MobileKanban />;
+    }
+
+    // Vista desktop
     return (
         <div className="h-[calc(100vh-6rem)] flex flex-col space-y-4">
             <div>
