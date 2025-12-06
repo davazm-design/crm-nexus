@@ -30,3 +30,76 @@ export async function GET(
         );
     }
 }
+
+// PATCH: Actualizar un lead
+export async function PATCH(
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+) {
+    try {
+        const { id } = await params;
+        const updates = await request.json();
+
+        // Separar history de otros updates (history es una relación)
+        const { history, ...scalarUpdates } = updates;
+
+        const updatedLead = await prisma.lead.update({
+            where: { id },
+            data: scalarUpdates,
+            include: { history: true },
+        });
+
+        return NextResponse.json(updatedLead);
+    } catch (error: any) {
+        console.error('Error updating lead:', error);
+
+        if (error.code === 'P2025') {
+            return NextResponse.json(
+                { error: 'Lead no encontrado' },
+                { status: 404 }
+            );
+        }
+
+        return NextResponse.json(
+            { error: 'Error al actualizar el prospecto' },
+            { status: 500 }
+        );
+    }
+}
+
+// DELETE: Eliminar un lead
+export async function DELETE(
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+) {
+    try {
+        const { id } = await params;
+
+        // Primero eliminar los mensajes relacionados
+        await prisma.message.deleteMany({
+            where: { leadId: id },
+        });
+
+        // Luego eliminar el lead
+        await prisma.lead.delete({
+            where: { id },
+        });
+
+        return NextResponse.json({ success: true });
+    } catch (error: any) {
+        console.error('Error deleting lead:', error);
+
+        if (error.code === 'P2025') {
+            return NextResponse.json(
+                { error: 'Lead no encontrado' },
+                { status: 404 }
+            );
+        }
+
+        return NextResponse.json(
+            { error: 'Error al eliminar el prospecto' },
+            { status: 500 }
+        );
+    }
+}
+
