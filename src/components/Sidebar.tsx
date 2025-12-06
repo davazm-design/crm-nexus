@@ -2,6 +2,7 @@
 
 import { useState, createContext, useContext, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { LayoutDashboard, Users, Upload, MessageSquare, Calendar, Settings, LogOut, Kanban, Menu, X } from 'lucide-react';
 import clsx from 'clsx';
@@ -84,14 +85,21 @@ export function Sidebar() {
                 "lg:translate-x-0",
                 isOpen ? "translate-x-0" : "-translate-x-full"
             )}>
-                <div className="flex h-20 items-center justify-center border-b border-white/5">
-                    <div className="flex items-center gap-2">
-                        <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
-                            <span className="text-white font-bold text-lg">N</span>
+                <div className="flex h-20 items-center justify-center border-b border-white/5 px-4">
+                    <div className="flex items-center gap-3">
+                        <Image
+                            src="/logo-teem.jpg"
+                            alt="TEEM Logo"
+                            width={40}
+                            height={40}
+                            className="rounded-lg"
+                        />
+                        <div>
+                            <h1 className="text-lg font-bold tracking-tight text-white font-outfit">
+                                TEEM<span className="text-indigo-400">CRM</span>
+                            </h1>
+                            <p className="text-[8px] text-slate-500 uppercase">Gestión de Prospectos</p>
                         </div>
-                        <h1 className="text-xl font-bold tracking-tight text-white font-outfit">
-                            NEXUS<span className="text-blue-400">CRM</span>
-                        </h1>
                     </div>
                 </div>
 

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Lead } from '@/types';
 import { MessageCircle, Users, Calendar, TrendingUp, ChevronRight, Phone, X, ArrowLeft } from 'lucide-react';
 import { format } from 'date-fns';
@@ -117,11 +118,15 @@ export function MobileDashboard({ leads }: MobileDashboardProps) {
             {/* Header */}
             <div className="pt-4 pb-2">
                 <div className="flex items-center gap-3 mb-3">
-                    <div className="h-9 w-9 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-blue-500/20">
-                        N
-                    </div>
+                    <Image
+                        src="/logo-teem.jpg"
+                        alt="TEEM Logo"
+                        width={36}
+                        height={36}
+                        className="rounded-lg"
+                    />
                     <div>
-                        <p className="text-[10px] text-slate-500 uppercase tracking-wider">NEXUSCRM</p>
+                        <p className="text-[10px] text-slate-500 uppercase tracking-wider">TEEMCRM</p>
                         <p className="text-sm font-medium text-white">Liceo Universitario ▾</p>
                     </div>
                 </div>

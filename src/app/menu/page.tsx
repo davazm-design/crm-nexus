@@ -83,7 +83,7 @@ export default function MobileMenuPage() {
 
             {/* Version */}
             <div className="text-center mt-8 text-xs text-slate-600">
-                NexusCRM v1.0.0
+                TEEMCRM v1.0.0
             </div>
         </div>
     );

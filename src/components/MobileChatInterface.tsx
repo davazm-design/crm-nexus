@@ -2,9 +2,10 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Lead, Message } from '@/types';
-import { Send, Phone, PhoneCall, Search, ArrowLeft, MessageCircle } from 'lucide-react';
+import { Send, Phone, PhoneCall, Search, ArrowLeft, MessageCircle, User } from 'lucide-react';
 import clsx from 'clsx';
 import { format } from 'date-fns';
+import { AddLeadModal } from './AddLeadModal';
 
 export function MobileChatInterface() {
     const [leads, setLeads] = useState<Lead[]>([]);
@@ -12,6 +13,7 @@ export function MobileChatInterface() {
     const [message, setMessage] = useState('');
     const [sending, setSending] = useState(false);
     const [sendError, setSendError] = useState<string | null>(null);
+    const [showContactModal, setShowContactModal] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -185,7 +187,7 @@ export function MobileChatInterface() {
     // Vista de conversación individual
     return (
         <div className="fixed inset-0 flex flex-col bg-slate-950 z-[60]">
-            {/* Header FIJO con botón regresar - con padding-right para no chocar con hamburguesa */}
+            {/* Header FIJO con botón regresar */}
             <div className="flex-shrink-0 bg-slate-900 border-b border-white/10 p-3 pr-16 flex items-center gap-3">
                 <button
                     onClick={() => setSelectedLeadId(null)}
@@ -193,18 +195,22 @@ export function MobileChatInterface() {
                 >
                     <ArrowLeft className="h-5 w-5" />
                 </button>
-                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold flex-shrink-0">
+                {/* Avatar y nombre clickeables para abrir tarjeta de contacto */}
+                <button
+                    onClick={() => setShowContactModal(true)}
+                    className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold flex-shrink-0 active:opacity-80"
+                >
                     {selectedLead.name.charAt(0)}
-                </div>
-                <div className="flex-1 min-w-0">
+                </button>
+                <button
+                    onClick={() => setShowContactModal(true)}
+                    className="flex-1 min-w-0 text-left active:opacity-80"
+                >
                     <p className="text-sm font-medium text-white truncate">{selectedLead.name}</p>
-                    <a
-                        href={`tel:+52${selectedLead.phone}`}
-                        className="text-[10px] text-green-400 hover:text-green-300"
-                    >
-                        📞 {selectedLead.phone}
-                    </a>
-                </div>
+                    <p className="text-[10px] text-slate-400 flex items-center gap-1">
+                        <User className="h-3 w-3" /> Ver tarjeta de contacto
+                    </p>
+                </button>
                 <a
                     href={`tel:+52${selectedLead.phone}`}
                     className="p-2 bg-green-600 rounded-xl text-white active:bg-green-500"
@@ -212,6 +218,29 @@ export function MobileChatInterface() {
                     <PhoneCall className="h-5 w-5" />
                 </a>
             </div>
+
+            {/* Modal de tarjeta de contacto */}
+            <AddLeadModal
+                isOpen={showContactModal}
+                onClose={() => setShowContactModal(false)}
+                onSave={async (updatedLead) => {
+                    try {
+                        const res = await fetch(`/api/leads/${selectedLead.id}`, {
+                            method: 'PATCH',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(updatedLead),
+                        });
+                        if (res.ok) {
+                            const saved = await res.json();
+                            setLeads(prev => prev.map(l => l.id === saved.id ? { ...l, ...saved } : l));
+                        }
+                    } catch (e) {
+                        console.error('Error updating lead:', e);
+                    }
+                    setShowContactModal(false);
+                }}
+                initialData={selectedLead}
+            />
 
             {/* Messages - Área scrollable */}
             <div className="flex-1 overflow-y-auto p-4 space-y-3">

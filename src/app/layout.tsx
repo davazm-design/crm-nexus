@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
-import { Sidebar, SidebarProvider, MobileMenuButton } from "@/components/Sidebar";
+import { Sidebar, SidebarProvider } from "@/components/Sidebar";
 import { BottomTabBar } from "@/components/BottomTabBar";
 import { MobileProvider } from "@/components/MobileProvider";
 
@@ -9,7 +9,7 @@ const inter = Inter({ subsets: ["latin"], variable: '--font-inter' });
 const outfit = Outfit({ subsets: ["latin"], variable: '--font-outfit' });
 
 export const metadata: Metadata = {
-  title: "Nexus CRM",
+  title: "TEEM CRM",
   description: "Advanced Lead Management System",
 };
 
@@ -37,10 +37,6 @@ export default function RootLayout({
 
               {/* Main Content */}
               <main className="flex-1 overflow-y-auto relative w-full">
-                {/* Mobile Header Button (for menu if needed) */}
-                <div className="lg:hidden">
-                  <MobileMenuButton />
-                </div>
 
                 {/* Background ambient glow */}
                 <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
