@@ -1,4 +1,4 @@
-# 🛠️ Stack Tecnológico (Nexus CRM)
+# 🛠️ Stack Tecnológico (TEEM CRM)
 
 Este documento describe las tecnologías, librerías y herramientas aprobadas para el proyecto. No introducir nuevas dependencias sin justificación crítica.
 

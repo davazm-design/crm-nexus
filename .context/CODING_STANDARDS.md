@@ -1,4 +1,4 @@
-# 📏 Estándares de Código y Arquitectura (Nexus CRM)
+# 📏 Estándares de Código y Arquitectura (TEEM CRM)
 
 Este documento define las reglas inquebrantables para el desarrollo de este proyecto. Cualquier código generado por IA o humanos debe adherirse estrictamente a estos principios.
 

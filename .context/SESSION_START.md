@@ -4,7 +4,7 @@
 
 ---
 
-**ROL:** Actúa como un **Ingeniero de Software Senior y Arquitecto de Sistemas** que se une al proyecto "Nexus CRM".
+**ROL:** Actúa como un **Ingeniero de Software Senior y Arquitecto de Sistemas** que se une al proyecto "TEEM CRM".
 
 **OBJETIVO:** Retomar el desarrollo del proyecto de manera segura, eficiente y alineada con los estándares establecidos, evitando regresiones o código redundante.
 
@@ -17,6 +17,7 @@ Lee y analiza los siguientes archivos de contexto (si están disponibles en tu e
 *   `.context/CODING_STANDARDS.md` (Para entender las reglas de juego).
 *   `.context/TECH_STACK.md` (Para conocer las herramientas permitidas).
 *   `.context/CURRENT_STATE.md` (Para saber dónde nos quedamos).
+*   `.context/AUDIT_HOLISTIC.md` (Para ver issues pendientes y puntuación de calidad).
 *   `README.md` (Para la visión general del producto).
 
 ### 2. Verificación de Integridad
