@@ -1,12 +1,12 @@
 # 📍 Estado Actual del Proyecto (Current State)
 
-> **Última Actualización:** 05 Diciembre 2025 - 22:59 CST
-> **Fase:** UI Móvil Completada ✅ | Configuración Pendiente 🚧
+> **Última Actualización:** 06 Diciembre 2025 - 14:27 CST
+> **Fase:** UI Móvil Optimizada ✅ | Calendario Funcional ✅ | Rebranding TEEM CRM ✅
 
 ---
 
 ## 🚀 Situación General
-El CRM está **desplegado en producción** en Vercel con base de datos PostgreSQL en Supabase. La integración de WhatsApp con Twilio está **completamente funcional**. La **versión móvil** del CRM está optimizada con navegación por tabs, dashboard responsivo y chat móvil dedicado.
+El CRM está **desplegado en producción** en Vercel con base de datos PostgreSQL en Supabase. La integración de WhatsApp con Twilio está **completamente funcional**. La **versión móvil** del CRM está completamente optimizada con navegación por tabs, dashboard responsivo, chat móvil y **calendario móvil con funcionalidad completa**. El proyecto ha sido renombrado de "Nexus CRM" a **"TEEM CRM"**.
 
 ---
 
@@ -30,6 +30,7 @@ El CRM está **desplegado en producción** en Vercel con base de datos PostgreSQ
 *   **Kanban Board:** Drag & drop optimizado con actualizaciones instantáneas
 *   **Lead Table:** Filtros, paginación, acciones masivas
 *   **Diseño:** Glassmorphism consistente y responsivo
+*   **Calendario:** Vista mensual con panel lateral de agenda del día
 
 ### 4. **WhatsApp REAL con Twilio**
 | Funcionalidad | Descripción |
@@ -39,26 +40,57 @@ El CRM está **desplegado en producción** en Vercel con base de datos PostgreSQ
 | ✅ Historial persistente | Mensajes guardados en tabla `messages` de Supabase |
 | ✅ Auto-formato MX | Números de 10 dígitos se convierten a `+521XXXXXXXXXX` |
 | ✅ UI bidireccional | Chat en tiempo real con polling |
-| ✅ Indicador de envío | Spinner durante envío, manejo de errores |
+| ✅ Indicador de envío | Spinner durante envío, manejo de errores descriptivos |
 | ✅ Badge de no leídos | Bolita verde pulsante en leads con mensajes nuevos |
 | ✅ Marcar como leído | Al abrir chat, se marcan mensajes como leídos |
+| ✅ Errores descriptivos | Códigos de error de Twilio mostrados al usuario |
 
-### 5. **Click-to-Call (Llamadas)** 🆕
+### 5. **Click-to-Call (Llamadas)**
 | Ubicación | Implementación |
 |-----------|----------------|
 | ✅ Editar Prospecto | Botón verde 📞 junto al campo teléfono |
 | ✅ Pipeline (Kanban) | Teléfono clickeable con hover verde |
 | ✅ WhatsApp Chat | Botón de llamada en header + teléfono clickeable |
+| ✅ Calendario | Teléfono clickeable en detalle de cita |
 
-### 6. **UI Móvil Completa** 🆕
+### 6. **UI Móvil Completa** 🆕 Optimizada
 | Componente | Descripción |
 |------------|-------------|
 | ✅ Bottom Tab Bar | Navegación fija inferior: Inicio, Pipeline, Chats, Más |
-| ✅ Mobile Dashboard | KPIs clickeables, agenda, chats recientes |
-| ✅ Mobile Chat | Lista de conversaciones + vista de chat individual con botón regresar |
+| ✅ Mobile Dashboard | KPIs clickeables, agenda, chats recientes, **Pull-to-Refresh** |
+| ✅ Mobile Chat | Lista de conversaciones + vista de chat, **Pull-to-Refresh** |
 | ✅ Mobile Menu | Página "Más" con acceso a todas las funciones |
-| ✅ Hamburger Menu | Esquina superior derecha para acceder al sidebar |
 | ✅ Safe Area | Soporte para notch/home indicator de iPhone |
+| ✅ Sin hamburguesa redundante | Eliminado botón hamburguesa (navegación vía BottomTabBar) |
+
+### 7. **Calendario de Citas Completo** 🆕
+| Funcionalidad | Descripción |
+|---------------|-------------|
+| ✅ Vista mensual | Grid de días con indicadores de citas |
+| ✅ Selección de día | Al tocar un día, muestra citas de ese día |
+| ✅ Agendar cita | Modal para buscar prospecto + seleccionar hora |
+| ✅ Selección de hora | 23 horarios de 8:00 AM a 7:00 PM (intervalos de 30 min) |
+| ✅ Editar cita | Modificar hora/fecha/notas de cita existente |
+| ✅ Marcar Inscrito | Un click para cambiar status a "enrolled" |
+| ✅ Marcar No Show | Un click para registrar que no se presentó |
+| ✅ Enviar WhatsApp | Link directo desde cita al chat |
+| ✅ Botón "Hoy" | Navegación rápida al día actual |
+| ✅ FAB (+) | Botón flotante para agregar cita rápida |
+| ✅ Lista próximas citas | Sección en móvil con citas futuras |
+| ✅ Pull-to-Refresh | Deslizar para actualizar datos |
+
+### 8. **Rebranding: TEEM CRM** 🆕
+| Cambio | Ubicación |
+|--------|-----------|
+| ✅ Nombre | "Nexus CRM" → "TEEM CRM" |
+| ✅ Logo | Nuevo logo `logo-teem.jpg` en Sidebar y Dashboard móvil |
+| ✅ Title | Título del navegador actualizado |
+| ✅ Versión | "TEEMCRM v1.0.0" en página de menú |
+
+### 9. **Tarjeta de Contacto desde Chat** 🆕
+*   Al tocar nombre/avatar del prospecto en el header del chat
+*   Se abre modal de edición (AddLeadModal) con datos del prospecto
+*   Permite editar y guardar cambios directamente
 
 ---
 
@@ -96,92 +128,98 @@ El CRM está **desplegado en producción** en Vercel con base de datos PostgreSQ
     *   Para iniciar conversaciones fuera de la ventana de 24hrs
     *   Requiere pre-aprobación de Twilio
 
-### Calendario
-*   Vista de citas pendientes
-*   Integración con agenda móvil
-
 ---
 
-## 📄 Archivos Clave Modificados Hoy (05-Dic-2025 Sesión Vespertina)
+## 📄 Archivos Clave Modificados (06-Dic-2025)
 
 ### Nuevos Archivos
 | Archivo | Propósito |
 |---------|-----------|
-| `src/components/MobileProvider.tsx` | Context para detectar móvil/tablet/desktop |
-| `src/components/BottomTabBar.tsx` | Navegación por tabs inferior para móvil |
-| `src/components/MobileDashboard.tsx` | Dashboard optimizado para móvil con KPIs clickeables |
-| `src/components/MobileChatInterface.tsx` | Chat de WhatsApp para móvil con botón regresar |
-| `src/app/menu/page.tsx` | Página "Más opciones" para navegación móvil |
-| `src/app/api/whatsapp/mark-read/route.ts` | API para marcar mensajes como leídos |
+| `src/components/MobileCalendar.tsx` | Calendario optimizado para móvil con todas las funcionalidades |
+| `src/components/PullToRefresh.tsx` | Componente reutilizable para "deslizar para actualizar" |
+| `public/logo-teem.jpg` | Logo de la nueva marca TEEM CRM |
 
 ### Archivos Modificados
 | Archivo | Cambios |
 |---------|---------|
-| `src/app/layout.tsx` | Integración de MobileProvider, BottomTabBar, meta tags PWA |
-| `src/app/page.tsx` | Renderizado condicional de MobileDashboard |
-| `src/app/whatsapp/page.tsx` | Renderizado condicional de MobileChatInterface |
-| `src/components/Sidebar.tsx` | Hamburger movido a esquina superior derecha |
-| `src/components/KanbanCard.tsx` | Click-to-call en teléfono, badge de mensajes nuevos |
-| `src/components/AddLeadModal.tsx` | Botón de llamar junto al campo teléfono |
-| `src/components/ChatInterface.tsx` | Botón de llamar en header, marcar como leído |
-| `src/types/index.ts` | Agregado `hasUnreadMessages` a interface Lead |
-| `src/app/globals.css` | Safe area para iPhone, ocultar scrollbars en móvil |
-| `prisma/schema.prisma` | Campo `hasUnreadMessages` en modelo Lead |
+| `src/app/layout.tsx` | Eliminado hamburguesa redundante, título "TEEM CRM" |
+| `src/app/page.tsx` | Integración de `onRefresh` para Pull-to-Refresh |
+| `src/app/calendar/page.tsx` | Renderizado condicional de MobileCalendar vs CalendarView |
+| `src/components/CalendarView.tsx` | Reescritura completa con funcionalidad completa |
+| `src/components/MobileDashboard.tsx` | Logo TEEM, Pull-to-Refresh, nombre actualizado |
+| `src/components/MobileChatInterface.tsx` | Pull-to-Refresh, tarjeta de contacto clickeable, fixes iOS |
+| `src/components/Sidebar.tsx` | Logo TEEM, nombre "TEEM CRM" |
+| `src/components/AddLeadModal.tsx` | z-index y padding ajustados para móvil |
+| `src/app/menu/page.tsx` | Versión "TEEMCRM v1.0.0" |
+| `src/app/globals.css` | Estilos para prevenir autocompletado iOS, viewport fixes |
+| `src/lib/twilio.ts` | Errores descriptivos con códigos de Twilio |
+| `src/app/api/whatsapp/send/route.ts` | Manejo mejorado de errores de Twilio |
 
 ---
 
-## 🐛 Errores Encontrados y Soluciones (Sesión de Hoy)
+## 🐛 Errores Encontrados y Soluciones (Sesión 06-Dic-2025)
 
-### 5. Error: Leads no aparecían después del deploy
-**Síntoma:** La tabla de leads y el Kanban estaban vacíos en producción, pero el lead existía en Supabase.
+### 10. Íconos de autocompletado de iOS en input de chat
+**Síntoma:** Al escribir en el input del chat móvil, aparecían 4 íconos verdes de autocompletado de iOS (contactos, passwords, etc.).
 
-**Causa:** Error `prepared statement "s0" already exists` - conflicto entre Prisma y PgBouncer de Supabase.
+**Causa:** iOS detectaba el campo como compatible con autocompletado.
 
-**Solución:** Agregar `&pgbouncer=true` al `DATABASE_URL` en las variables de entorno de Vercel:
-```
-DATABASE_URL=postgresql://...@...supabase.com:6543/postgres?sslmode=require&pgbouncer=true
-```
-
----
-
-### 6. Dashboard móvil más ancho que la pantalla
-**Síntoma:** Las tarjetas de KPIs no cabían en la pantalla del celular.
-
-**Causa:** El grid usaba padding y tamaños que excedían el viewport.
-
-**Solución:** Refactorizar `MobileDashboard.tsx` con:
-- Grid 2x2 compacto con `gap-2` en lugar de `gap-3`
-- Padding reducido `p-3` en lugar de `p-4`
-- Tamaños de fuente más pequeños
+**Solución:** 
+- Agregar atributos `autoComplete="off"`, `autoCorrect="off"`, `spellCheck="false"`, `data-form-type="other"` al input
+- CSS para ocultar `::-webkit-contacts-auto-fill-button` y `::-webkit-credentials-auto-fill-button`
 
 ---
 
-### 7. Bottom Tab Bar se escondía al hacer scroll
-**Síntoma:** La barra de navegación inferior desaparecía.
+### 11. Chat header desaparecía al escribir (móvil)
+**Síntoma:** El header del chat con el nombre del prospecto se escondía cuando el teclado aparecía.
 
-**Causa:** El contenedor padre tenía overflow que afectaba el fixed positioning.
+**Causa:** El viewport se re-ajustaba con el teclado y el sticky positioning fallaba.
 
-**Solución:** Asegurar `fixed bottom-0 left-0 right-0 z-50` en BottomTabBar y usar `pb-[env(safe-area-inset-bottom)]` para el iPhone.
-
----
-
-### 8. Sin botón de regresar en chat móvil
-**Síntoma:** Al abrir una conversación en móvil, no había forma de volver a la lista.
-
-**Causa:** Se estaba usando el mismo componente de desktop que no tiene navegación de retorno.
-
-**Solución:** Crear `MobileChatInterface.tsx` con dos vistas:
-- Vista de lista (cuando `selectedLead` es null)
-- Vista de conversación (con botón ⬅️ para regresar)
+**Solución:** Refactorizar el layout del chat con contenedor flex-col con h-[100dvh], z-index más altos y overflow controlado.
 
 ---
 
-### 9. Property 'hasUnreadMessages' does not exist on type 'Lead'
-**Síntoma:** Error de TypeScript al compilar.
+### 12. Botón de enviar no visible en chat móvil
+**Síntoma:** El botón de enviar mensaje quedaba fuera de la pantalla.
 
-**Causa:** Se agregó el campo en Prisma pero no en la interface de TypeScript.
+**Causa:** El input ocupaba todo el espacio sin dejar lugar para el botón.
 
-**Solución:** Agregar `hasUnreadMessages?: boolean` a la interface `Lead` en `src/types/index.ts`.
+**Solución:** Aplicar `min-w-[44px] min-h-[44px]` al botón y `flex-1 min-w-0` al input para que el botón siempre tenga espacio.
+
+---
+
+### 13. iOS zoom automático en inputs
+**Síntoma:** iOS hacía zoom al enfocar campos de texto con font-size < 16px.
+
+**Causa:** iOS automáticamente hace zoom en inputs con fuente menor a 16px.
+
+**Solución:** Usar `text-base` (16px) en inputs de chat móvil y agregar clase `.mobile-chat-input` con font-size: 16px forzado para WebKit.
+
+---
+
+### 14. Calendario móvil sin funcionalidad
+**Síntoma:** El calendario en móvil mostraba solo la vista del mes pero no se podía interactuar ni ver citas.
+
+**Causa:** El componente CalendarView de desktop tenía un layout de dos columnas que ocultaba el panel lateral en móvil.
+
+**Solución:** Crear componente `MobileCalendar.tsx` dedicado con:
+- Vista principal con grid de días
+- Vista de día al tocar una fecha
+- Modal de agendar/editar
+- FAB para agregar cita rápida
+- Pull-to-Refresh
+
+---
+
+### 15. Modal de editar prospecto sin botón de guardar visible (móvil)
+**Síntoma:** Al abrir un prospecto desde Pipeline en móvil, los botones de Cancelar/Guardar estaban ocultos.
+
+**Causa:** El modal usaba max-h-[90vh] pero el BottomTabBar ocupaba espacio extra, y el z-index era menor al del TabBar.
+
+**Solución:**
+- Aumentar z-index a z-[70] (por encima del TabBar z-50)
+- Agregar `pb-20 lg:pb-4` para padding inferior en móvil
+- Reducir max-height a 85vh en móvil
 
 ---
 
@@ -241,5 +279,15 @@ Mismas variables + cualquier override necesario para desarrollo.
 *   La autenticación es inexistente (cualquiera puede acceder).
 *   El polling de mensajes cada 5 segundos puede ser ineficiente a escala (considerar WebSockets o Server-Sent Events).
 *   El Sandbox de Twilio requiere que el usuario envíe "join citizen-equipment" antes de poder recibir mensajes.
-*   La versión móvil del Pipeline (Kanban) aún usa la versión desktop.
+*   La versión móvil del Pipeline (Kanban) usa una versión adaptada pero no optimizada.
 *   La sección de Configuración no tiene funcionalidad implementada.
+*   La URL del proyecto en Vercel sigue siendo "crm-nexus" aunque el nombre cambió a TEEM CRM.
+
+---
+
+## 📈 Próximos Pasos Sugeridos
+1. **Optimizar Kanban Móvil** - Crear vista de cards scrollables por columna
+2. **Sistema de Autenticación** - NextAuth con roles
+3. **Picker de Emojis** - Agregar funcionalidad al botón de emojis
+4. **Plantillas de Mensajes** - Sistema de respuestas rápidas
+5. **Notificaciones Push** - Alertas para nuevos mensajes (Service Worker)
