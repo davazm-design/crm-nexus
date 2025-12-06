@@ -1,6 +1,18 @@
+'use client';
+
 import { ChatInterface } from '@/components/ChatInterface';
+import { MobileChatInterface } from '@/components/MobileChatInterface';
+import { useMobile } from '@/components/MobileProvider';
 
 export default function WhatsAppPage() {
+    const { isMobile } = useMobile();
+
+    // Versión móvil: interfaz completamente diferente
+    if (isMobile) {
+        return <MobileChatInterface />;
+    }
+
+    // Versión desktop
     return (
         <div className="space-y-6 h-full flex flex-col">
             <div>

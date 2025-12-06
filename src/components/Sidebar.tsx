@@ -49,7 +49,7 @@ export function MobileMenuButton() {
     return (
         <button
             onClick={toggle}
-            className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-xl bg-slate-800/80 backdrop-blur-md border border-white/10 text-white shadow-lg"
+            className="lg:hidden fixed top-4 right-4 z-50 p-2 rounded-xl bg-slate-800/80 backdrop-blur-md border border-white/10 text-white shadow-lg"
             aria-label={isOpen ? 'Cerrar menú' : 'Abrir menú'}
         >
             {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
