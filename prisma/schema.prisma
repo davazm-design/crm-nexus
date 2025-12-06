@@ -15,6 +15,7 @@ datasource db {
 // ENUMS
 // ============================================
 
+// Estados del lead en el pipeline
 enum LeadStatus {
   new
   cleaned
@@ -27,21 +28,98 @@ enum LeadStatus {
   not_enrolled
 }
 
+// Prioridad del lead
 enum LeadPriority {
   hot
   warm
   cold
 }
 
+// Quien envía el mensaje
 enum MessageSender {
   executive
   prospect
 }
 
-// Roles de usuario para autorización
+// Roles de usuario (jerárquicos)
+// SUPER_ADMIN > OWNER > ADMIN > DIRECTOR > MANAGER > AGENT
 enum UserRole {
-  ADMIN
-  EXECUTIVE
+  SUPER_ADMIN   // Dueño del SaaS (tú)
+  OWNER         // Dueño del negocio (cliente que paga)
+  ADMIN         // Administrador de la organización
+  DIRECTOR      // Director de unidad de negocio
+  MANAGER       // Gerente/Coordinador de ventas
+  AGENT         // Ejecutivo de prospección
+}
+
+// Estado de suscripción de la organización
+enum SubscriptionStatus {
+  TRIAL
+  ACTIVE
+  PAST_DUE
+  CANCELLED
+  SUSPENDED
+}
+
+// ============================================
+// MODELOS MULTI-TENANT
+// ============================================
+
+// Organización = Cliente/Tenant (Ej: "Colegio ABC")
+model Organization {
+  id            String   @id @default(uuid())
+  name          String   // "Colegio ABC"
+  slug          String   @unique // "colegio-abc" (para URLs)
+  logo          String?  // URL del logo
+  
+  // Configuración
+  timezone      String   @default("America/Mexico_City")
+  
+  // Suscripción/Facturación
+  subscriptionStatus SubscriptionStatus @default(TRIAL)
+  trialEndsAt   DateTime?
+  
+  // Metadatos
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relaciones
+  businessUnits BusinessUnit[]
+  users         User[]
+  leads         Lead[]
+  
+  @@map("organizations")
+}
+
+// Unidad de Negocio (Ej: "Preparatoria", "Primaria")
+model BusinessUnit {
+  id            String   @id @default(uuid())
+  name          String   // "Preparatoria"
+  slug          String   // "preparatoria"
+  description   String?
+  color         String?  // Color para UI (hex)
+  
+  // WhatsApp específico de esta unidad
+  whatsappNumber String? // Número de WhatsApp de esta unidad
+  
+  // Configuración
+  isActive      Boolean  @default(true)
+  
+  // Metadatos
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relación con Organización
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  // Relaciones
+  users         UserBusinessUnit[]
+  leads         Lead[]
+  
+  @@unique([organizationId, slug])
+  @@index([organizationId])
+  @@map("business_units")
 }
 
 // ============================================
@@ -54,16 +132,55 @@ model User {
   email         String    @unique
   emailVerified DateTime?
   image         String?
-  role          UserRole  @default(EXECUTIVE)
+  phone         String?   // Para contacto interno
+  
+  // Rol global del usuario
+  role          UserRole  @default(AGENT)
+  isActive      Boolean   @default(true)
+  
+  // Organización principal (para OWNER, ADMIN, etc.)
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   
   // Relaciones de NextAuth
   accounts      Account[]
   sessions      Session[]
   
+  // Relación con unidades de negocio (un usuario puede estar en múltiples)
+  businessUnits UserBusinessUnit[]
+  
+  // Leads asignados a este usuario
+  assignedLeads Lead[]    @relation("AssignedAgent")
+  createdLeads  Lead[]    @relation("CreatedBy")
+  
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   
+  @@index([organizationId])
+  @@index([role])
   @@map("users")
+}
+
+// Tabla pivote: Usuario <-> Unidad de Negocio (muchos a muchos)
+model UserBusinessUnit {
+  id             String   @id @default(uuid())
+  
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  businessUnitId String
+  businessUnit   BusinessUnit @relation(fields: [businessUnitId], references: [id], onDelete: Cascade)
+  
+  // El usuario puede tener un rol específico por unidad (opcional)
+  // Si es null, usa el rol global del usuario
+  roleOverride   UserRole?
+  
+  assignedAt     DateTime @default(now())
+  
+  @@unique([userId, businessUnitId])
+  @@index([userId])
+  @@index([businessUnitId])
+  @@map("user_business_units")
 }
 
 model Account {
@@ -114,11 +231,24 @@ model Lead {
   id            String    @id @default(uuid())
   name          String
   phone         String
-  email         String?   // Opcional según nuestra validación actual
+  email         String?
   source        String    // Código de fuente (01-07)
   
+  // MULTI-TENANT: A qué organización y unidad pertenece
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  businessUnitId String?
+  businessUnit   BusinessUnit? @relation(fields: [businessUnitId], references: [id], onDelete: SetNull)
+  
+  // Asignación de agente
+  assignedToId  String?
+  assignedTo    User?     @relation("AssignedAgent", fields: [assignedToId], references: [id], onDelete: SetNull)
+  
+  createdById   String?
+  createdBy     User?     @relation("CreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  
   // Metadatos de negocio
-  businessUnit  String?   // ID de la unidad (beeplay, etc.)
   priority      LeadPriority? @default(warm)
   interestCycle String?   // "Enero 2025", etc.
   
@@ -129,26 +259,29 @@ model Lead {
   updatedAt     DateTime  @updatedAt
   scheduledAt   DateTime?
   
-  // Datos no estructurados o arrays simples
-  tags          String[]  // PostgreSQL soporta arrays nativos
+  // Datos adicionales
+  tags          String[]
   observations  String?   @db.Text
   
   // WhatsApp tracking
-  hasUnreadMessages Boolean @default(false) // True cuando hay mensajes del prospecto sin leer
+  hasUnreadMessages Boolean @default(false)
   
   // Relaciones
-  history       Message[] // Relación 1:N con mensajes
+  history       Message[]
   
-  // Índices para optimización de queries
+  // Índices para optimización
+  @@index([organizationId])
+  @@index([businessUnitId])
+  @@index([assignedToId])
   @@index([phone])
   @@index([status])
   @@index([createdAt(sort: Desc)])
-  @@index([businessUnit, status])
+  @@index([organizationId, businessUnitId, status])
   
   @@map("leads")
 }
 
-// Tabla separada para el historial de mensajes (Normalización)
+// Historial de mensajes de WhatsApp
 model Message {
   id        String   @id @default(uuid())
   content   String   @db.Text
@@ -160,5 +293,6 @@ model Message {
   lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
   
   @@index([leadId])
+  @@index([timestamp(sort: Desc)])
   @@map("messages")
 }
