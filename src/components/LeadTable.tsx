@@ -257,13 +257,13 @@ export function LeadTable() {
     const filteredLeads = leads.filter(lead => {
         const matchesSearch =
             lead.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            lead.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (lead.email?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
             lead.phone.includes(searchQuery);
 
         const matchesStatus = statusFilter === 'all' || lead.status === statusFilter;
         const matchesSource = sourceFilter === 'all' || lead.source === sourceFilter;
         const matchesPriority = priorityFilter === 'all' || (lead.priority || 'warm') === priorityFilter;
-        const matchesBusinessUnit = businessUnitFilter === 'all' || lead.businessUnit === businessUnitFilter;
+        const matchesBusinessUnit = businessUnitFilter === 'all' || lead.businessUnitId === businessUnitFilter;
 
         return matchesSearch && matchesStatus && matchesSource && matchesPriority && matchesBusinessUnit;
     });
@@ -641,9 +641,9 @@ export function LeadTable() {
                                             </td>
                                             <td className="px-2 py-4 whitespace-nowrap border-r border-white/10 overflow-hidden max-w-0">
                                                 <div className="flex justify-center w-full">
-                                                    {lead.businessUnit ? (
+                                                    {lead.businessUnitId ? (
                                                         (() => {
-                                                            const unit = getBusinessUnit(lead.businessUnit);
+                                                            const unit = getBusinessUnit(lead.businessUnitId);
                                                             return unit ? (
                                                                 <span
                                                                     className={clsx(

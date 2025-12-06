@@ -234,9 +234,9 @@ model Lead {
   email         String?
   source        String    // Código de fuente (01-07)
   
-  // MULTI-TENANT: A qué organización y unidad pertenece
-  organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  // MULTI-TENANT: A qué organización y unidad pertenece (opcional durante migración)
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   
   businessUnitId String?
   businessUnit   BusinessUnit? @relation(fields: [businessUnitId], references: [id], onDelete: SetNull)

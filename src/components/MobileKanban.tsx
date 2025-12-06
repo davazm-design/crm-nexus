@@ -363,7 +363,7 @@ function MobileKanbanCard({
     onCloseSelector,
     columns
 }: MobileKanbanCardProps) {
-    const businessUnit = lead.businessUnit ? getBusinessUnit(lead.businessUnit) : null;
+    const businessUnit = lead.businessUnitId ? getBusinessUnit(lead.businessUnitId) : null;
 
     return (
         <div className="bg-slate-900/70 rounded-xl border border-white/5 overflow-hidden">

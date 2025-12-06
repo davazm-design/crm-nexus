@@ -78,19 +78,32 @@ export async function getLeads(): Promise<Lead[]> {
 
 export async function addLead(lead: Lead): Promise<Lead> {
     if (IS_PRODUCTION) {
-        // Prisma create
-        const { history, ...leadData } = lead;
+        // Prisma create - extract only valid Prisma fields
         const newLead = await prisma.lead.create({
             data: {
-                ...leadData,
+                id: lead.id,
+                name: lead.name,
+                phone: lead.phone,
+                email: lead.email || null,
+                source: lead.source,
+                organizationId: lead.organizationId || null,
+                businessUnitId: lead.businessUnitId || null,
+                assignedToId: lead.assignedToId || null,
+                createdById: lead.createdById || null,
+                priority: lead.priority || 'warm',
+                interestCycle: lead.interestCycle || null,
+                status: lead.status || 'new',
+                tags: lead.tags || [],
+                observations: lead.observations || null,
+                hasUnreadMessages: lead.hasUnreadMessages || false,
                 // Handle history creation if any exists initially
-                history: {
-                    create: history.map(msg => ({
+                history: lead.history?.length > 0 ? {
+                    create: lead.history.map(msg => ({
                         content: msg.content,
                         sender: msg.sender,
-                        timestamp: new Date(msg.timestamp) // Ensure Date type
+                        timestamp: new Date(msg.timestamp)
                     }))
-                }
+                } : undefined
             },
             include: { history: true }
         });
@@ -106,12 +119,28 @@ export async function addLead(lead: Lead): Promise<Lead> {
 export async function updateLead(id: string, updates: Partial<Lead>): Promise<Lead | null> {
     if (IS_PRODUCTION) {
         try {
-            // Separate history from other updates as it's a relation
-            const { history, ...scalarUpdates } = updates;
+            // Extract only scalar fields valid for Prisma
+            const prismaUpdates: any = {};
+
+            if (updates.name !== undefined) prismaUpdates.name = updates.name;
+            if (updates.phone !== undefined) prismaUpdates.phone = updates.phone;
+            if (updates.email !== undefined) prismaUpdates.email = updates.email;
+            if (updates.source !== undefined) prismaUpdates.source = updates.source;
+            if (updates.organizationId !== undefined) prismaUpdates.organizationId = updates.organizationId;
+            if (updates.businessUnitId !== undefined) prismaUpdates.businessUnitId = updates.businessUnitId;
+            if (updates.assignedToId !== undefined) prismaUpdates.assignedToId = updates.assignedToId;
+            if (updates.createdById !== undefined) prismaUpdates.createdById = updates.createdById;
+            if (updates.priority !== undefined) prismaUpdates.priority = updates.priority;
+            if (updates.interestCycle !== undefined) prismaUpdates.interestCycle = updates.interestCycle;
+            if (updates.status !== undefined) prismaUpdates.status = updates.status;
+            if (updates.tags !== undefined) prismaUpdates.tags = updates.tags;
+            if (updates.observations !== undefined) prismaUpdates.observations = updates.observations;
+            if (updates.scheduledAt !== undefined) prismaUpdates.scheduledAt = updates.scheduledAt;
+            if (updates.hasUnreadMessages !== undefined) prismaUpdates.hasUnreadMessages = updates.hasUnreadMessages;
 
             const updatedLead = await prisma.lead.update({
                 where: { id },
-                data: scalarUpdates,
+                data: prismaUpdates,
                 include: { history: true }
             });
             return updatedLead as unknown as Lead;

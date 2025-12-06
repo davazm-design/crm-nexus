@@ -35,7 +35,7 @@ export async function POST(request: Request) {
             source: validation.data.source,
             priority: validation.data.priority,
             interestCycle: validation.data.interestCycle as any, // Cast to avoid strict enum issues if any
-            businessUnit: validation.data.businessUnit as any,
+            businessUnitId: validation.data.businessUnit as any,
         };
 
         const createdLead = await addLead(newLead);

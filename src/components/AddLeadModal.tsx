@@ -23,7 +23,7 @@ export function AddLeadModal({ isOpen, onClose, onSave, initialData }: AddLeadMo
         observations: string;
         priority: LeadPriority;
         interestCycle?: InterestCycle;
-        businessUnit?: BusinessUnitId;
+        businessUnitId?: BusinessUnitId;
     }>({
         name: '',
         phone: '',
@@ -32,7 +32,7 @@ export function AddLeadModal({ isOpen, onClose, onSave, initialData }: AddLeadMo
         observations: '',
         priority: 'warm' as LeadPriority,
         interestCycle: undefined,
-        businessUnit: undefined,
+        businessUnitId: undefined,
     });
     const [error, setError] = useState<string | null>(null);
 
@@ -46,10 +46,10 @@ export function AddLeadModal({ isOpen, onClose, onSave, initialData }: AddLeadMo
                 observations: initialData.observations || '',
                 priority: initialData.priority || 'warm',
                 interestCycle: initialData.interestCycle || undefined,
-                businessUnit: initialData.businessUnit || undefined,
+                businessUnitId: initialData.businessUnitId as BusinessUnitId || undefined,
             });
         } else {
-            setFormData({ name: '', phone: '', email: '', source: '', observations: '', priority: 'warm', interestCycle: undefined, businessUnit: undefined });
+            setFormData({ name: '', phone: '', email: '', source: '', observations: '', priority: 'warm', interestCycle: undefined, businessUnitId: undefined });
         }
     }, [initialData, isOpen]);
 
@@ -285,8 +285,8 @@ export function AddLeadModal({ isOpen, onClose, onSave, initialData }: AddLeadMo
                                 <div className="relative">
                                     <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 group-focus-within:text-blue-400 transition-colors pointer-events-none z-10" />
                                     <select
-                                        value={formData.businessUnit || ''}
-                                        onChange={(e) => setFormData({ ...formData, businessUnit: e.target.value as BusinessUnitId || undefined })}
+                                        value={formData.businessUnitId || ''}
+                                        onChange={(e) => setFormData({ ...formData, businessUnitId: e.target.value as BusinessUnitId || undefined })}
                                         className="w-full bg-slate-800/50 border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all appearance-none cursor-pointer"
                                     >
                                         <option value="">Selecciona una unidad...</option>

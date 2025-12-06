@@ -28,7 +28,7 @@ export function KanbanCard({ lead, onEdit }: KanbanCardProps) {
         transition,
     };
 
-    const businessUnit = lead.businessUnit ? getBusinessUnit(lead.businessUnit) : null;
+    const businessUnit = lead.businessUnitId ? getBusinessUnit(lead.businessUnitId) : null;
 
     return (
         <div
