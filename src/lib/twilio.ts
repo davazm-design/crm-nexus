@@ -14,8 +14,32 @@ if (!accountSid || !authToken) {
 const client = accountSid && authToken ? twilio(accountSid, authToken) : null;
 
 /**
+ * Formatea un número de teléfono para WhatsApp
+ * - Si tiene 10 dígitos (México), agrega +521
+ * - Si ya tiene +, lo deja como está
+ * - Si no, agrega +
+ */
+function formatPhoneForWhatsApp(phone: string): string {
+    // Limpiar espacios y caracteres no numéricos excepto +
+    const cleaned = phone.replace(/[^\d+]/g, '');
+
+    // Si tiene 10 dígitos exactos (número mexicano sin código), agregar +521
+    if (/^\d{10}$/.test(cleaned)) {
+        return `+521${cleaned}`;
+    }
+
+    // Si ya tiene +, dejarlo
+    if (cleaned.startsWith('+')) {
+        return cleaned;
+    }
+
+    // Si no, agregar +
+    return `+${cleaned}`;
+}
+
+/**
  * Envía un mensaje de WhatsApp a un número de teléfono
- * @param to - Número de destino en formato E.164 (ej: +5215512345678)
+ * @param to - Número de destino (puede ser 10 dígitos o formato E.164)
  * @param message - Contenido del mensaje
  * @returns El SID del mensaje enviado o null si hubo error
  */
@@ -26,9 +50,11 @@ export async function sendWhatsAppMessage(to: string, message: string): Promise<
     }
 
     try {
-        // Formatear números para WhatsApp
+        const formattedPhone = formatPhoneForWhatsApp(to);
         const fromWhatsApp = `whatsapp:${whatsappNumber}`;
-        const toWhatsApp = `whatsapp:${to.startsWith('+') ? to : '+' + to}`;
+        const toWhatsApp = `whatsapp:${formattedPhone}`;
+
+        console.log(`📱 Sending WhatsApp to ${toWhatsApp} from ${fromWhatsApp}`);
 
         const result = await client.messages.create({
             from: fromWhatsApp,
