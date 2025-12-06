@@ -29,7 +29,7 @@ export default function RootLayout({
       <body className={`${inter.variable} ${outfit.variable} font-sans antialiased`}>
         <MobileProvider>
           <SidebarProvider>
-            <div className="flex h-screen overflow-hidden bg-slate-950 text-slate-200">
+            <div className="flex h-screen overflow-hidden overflow-x-hidden bg-slate-950 text-slate-200 max-w-[100vw]">
               {/* Desktop Sidebar - hidden on mobile */}
               <div className="hidden lg:block">
                 <Sidebar />

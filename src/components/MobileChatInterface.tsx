@@ -184,12 +184,12 @@ export function MobileChatInterface() {
 
     // Vista de conversación individual
     return (
-        <div className="flex flex-col h-screen bg-slate-950">
-            {/* Header con botón regresar */}
-            <div className="sticky top-0 bg-slate-900/95 backdrop-blur-lg z-10 p-3 border-b border-white/5 flex items-center gap-3">
+        <div className="fixed inset-0 flex flex-col bg-slate-950 z-[60]">
+            {/* Header FIJO con botón regresar - con padding-right para no chocar con hamburguesa */}
+            <div className="flex-shrink-0 bg-slate-900 border-b border-white/10 p-3 pr-16 flex items-center gap-3">
                 <button
                     onClick={() => setSelectedLeadId(null)}
-                    className="p-2 rounded-xl bg-slate-800 text-white"
+                    className="p-2 rounded-xl bg-slate-800 text-white active:bg-slate-700"
                 >
                     <ArrowLeft className="h-5 w-5" />
                 </button>
@@ -198,18 +198,30 @@ export function MobileChatInterface() {
                 </div>
                 <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-white truncate">{selectedLead.name}</p>
-                    <p className="text-[10px] text-slate-400">{selectedLead.phone}</p>
+                    <a
+                        href={`tel:+52${selectedLead.phone}`}
+                        className="text-[10px] text-green-400 hover:text-green-300"
+                    >
+                        📞 {selectedLead.phone}
+                    </a>
                 </div>
                 <a
                     href={`tel:+52${selectedLead.phone}`}
-                    className="p-2 bg-green-600 rounded-xl text-white"
+                    className="p-2 bg-green-600 rounded-xl text-white active:bg-green-500"
                 >
                     <PhoneCall className="h-5 w-5" />
                 </a>
             </div>
 
-            {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3 pb-20">
+            {/* Messages - Área scrollable */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                {selectedLead.history.length === 0 && (
+                    <div className="flex flex-col items-center justify-center h-full text-center text-slate-500">
+                        <MessageCircle className="h-12 w-12 mb-2 opacity-50" />
+                        <p>No hay mensajes aún</p>
+                        <p className="text-xs mt-1">Escribe un mensaje para iniciar la conversación</p>
+                    </div>
+                )}
                 {selectedLead.history.map((msg) => {
                     const isExecutive = msg.sender === 'executive';
                     return (
@@ -242,8 +254,8 @@ export function MobileChatInterface() {
                 <div ref={messagesEndRef} />
             </div>
 
-            {/* Input - Fixed at bottom */}
-            <div className="fixed bottom-14 left-0 right-0 p-3 bg-slate-900/95 backdrop-blur-lg border-t border-white/5">
+            {/* Input FIJO en la parte inferior - sobre el BottomTabBar */}
+            <div className="flex-shrink-0 p-3 bg-slate-900 border-t border-white/10 mb-14 safe-area-bottom">
                 {sendError && (
                     <div className="mb-2 p-2 bg-red-500/20 border border-red-500/50 rounded-lg text-xs text-red-300">
                         {sendError}
@@ -262,7 +274,7 @@ export function MobileChatInterface() {
                         onClick={handleSendMessage}
                         disabled={sending || !message.trim()}
                         className={clsx(
-                            "p-3 rounded-xl text-white transition-all",
+                            "p-3 rounded-xl text-white transition-all flex-shrink-0",
                             sending || !message.trim()
                                 ? 'bg-slate-700 text-slate-400'
                                 : 'bg-blue-600 hover:bg-blue-500 active:scale-95'
