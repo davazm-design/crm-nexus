@@ -52,13 +52,24 @@ async function writeDB(data: DB): Promise<void> {
 // --- HYBRID EXPORTS ---
 
 export async function getLeads(): Promise<Lead[]> {
-    if (IS_PRODUCTION) {
-        const leads = await prisma.lead.findMany({
-            include: { history: true },
-            orderBy: { createdAt: 'desc' }
-        });
-        // Map Prisma types to our App types if necessary (mostly compatible)
-        return leads as unknown as Lead[];
+    console.log('🔍 getLeads called. NODE_ENV:', process.env.NODE_ENV, 'IS_PRODUCTION:', IS_PRODUCTION);
+
+    // Force Prisma in production OR when DATABASE_URL is set
+    const usePrisma = IS_PRODUCTION || process.env.DATABASE_URL;
+
+    if (usePrisma) {
+        try {
+            console.log('📦 Using Prisma to fetch leads...');
+            const leads = await prisma.lead.findMany({
+                include: { history: true },
+                orderBy: { createdAt: 'desc' }
+            });
+            console.log(`✅ Prisma returned ${leads.length} leads`);
+            return leads as unknown as Lead[];
+        } catch (error) {
+            console.error('❌ Error fetching leads from Prisma:', error);
+            throw error;
+        }
     } else {
         const db = await readDB();
         return db.leads;
