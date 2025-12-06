@@ -4,7 +4,8 @@ import { useState, createContext, useContext, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Users, Upload, MessageSquare, Calendar, Settings, LogOut, Kanban, Menu, X } from 'lucide-react';
+import { useSession, signOut } from 'next-auth/react';
+import { LayoutDashboard, Users, Upload, MessageSquare, Calendar, Settings, LogOut, Kanban, Menu, X, Shield, Loader2 } from 'lucide-react';
 import clsx from 'clsx';
 
 const navItems = [
@@ -61,11 +62,32 @@ export function MobileMenuButton() {
 export function Sidebar() {
     const pathname = usePathname();
     const { isOpen, close } = useSidebar();
+    const { data: session, status } = useSession();
 
     // Cerrar sidebar al cambiar de ruta (en móvil)
     useEffect(() => {
         close();
     }, [pathname]);
+
+    const handleSignOut = () => {
+        signOut({ callbackUrl: '/login' });
+    };
+
+    // Obtener iniciales del nombre
+    const getInitials = (name?: string | null) => {
+        if (!name) return '??';
+        return name
+            .split(' ')
+            .map(n => n[0])
+            .join('')
+            .toUpperCase()
+            .slice(0, 2);
+    };
+
+    // Obtener rol legible
+    const getRoleLabel = (role?: string) => {
+        return role === 'ADMIN' ? 'Administrador' : 'Ejecutivo';
+    };
 
     return (
         <>
@@ -133,17 +155,42 @@ export function Sidebar() {
                     </nav>
                 </div>
 
+                {/* User Section */}
                 <div className="p-4 border-t border-white/5 bg-slate-900/30">
-                    <div className="flex items-center p-2 rounded-xl hover:bg-white/5 transition-colors cursor-pointer group">
-                        <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-slate-700 to-slate-600 flex items-center justify-center text-sm font-bold text-white shadow-inner border border-white/10">
-                            DA
+                    {status === 'loading' ? (
+                        <div className="flex items-center justify-center p-4">
+                            <Loader2 className="h-5 w-5 animate-spin text-slate-500" />
                         </div>
-                        <div className="ml-3 flex-1">
-                            <p className="text-sm font-medium text-white group-hover:text-blue-400 transition-colors">David Vazquez</p>
-                            <p className="text-xs text-slate-500">Administrador</p>
+                    ) : session?.user ? (
+                        <div
+                            onClick={handleSignOut}
+                            className="flex items-center p-2 rounded-xl hover:bg-red-500/10 transition-colors cursor-pointer group"
+                        >
+                            {session.user.image ? (
+                                <img
+                                    src={session.user.image}
+                                    alt={session.user.name || 'Usuario'}
+                                    className="h-10 w-10 rounded-full border border-white/10"
+                                />
+                            ) : (
+                                <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-sm font-bold text-white shadow-inner border border-white/10">
+                                    {getInitials(session.user.name)}
+                                </div>
+                            )}
+                            <div className="ml-3 flex-1 min-w-0">
+                                <p className="text-sm font-medium text-white truncate group-hover:text-red-400 transition-colors">
+                                    {session.user.name || 'Usuario'}
+                                </p>
+                                <div className="flex items-center gap-1">
+                                    <Shield className="h-3 w-3 text-slate-500" />
+                                    <p className="text-xs text-slate-500">
+                                        {getRoleLabel(session.user.role)}
+                                    </p>
+                                </div>
+                            </div>
+                            <LogOut className="h-4 w-4 text-slate-500 group-hover:text-red-400 transition-colors" />
                         </div>
-                        <LogOut className="h-4 w-4 text-slate-500 group-hover:text-red-400 transition-colors" />
-                    </div>
+                    ) : null}
                 </div>
             </div>
         </>

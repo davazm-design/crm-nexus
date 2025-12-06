@@ -4,6 +4,7 @@ import "./globals.css";
 import { Sidebar, SidebarProvider } from "@/components/Sidebar";
 import { BottomTabBar } from "@/components/BottomTabBar";
 import { MobileProvider } from "@/components/MobileProvider";
+import { AuthProvider } from "@/components/AuthProvider";
 
 const inter = Inter({ subsets: ["latin"], variable: '--font-inter' });
 const outfit = Outfit({ subsets: ["latin"], variable: '--font-outfit' });
@@ -27,36 +28,38 @@ export default function RootLayout({
         <meta name="theme-color" content="#020617" />
       </head>
       <body className={`${inter.variable} ${outfit.variable} font-sans antialiased`}>
-        <MobileProvider>
-          <SidebarProvider>
-            <div className="flex h-screen overflow-hidden overflow-x-hidden bg-slate-950 text-slate-200 max-w-[100vw]">
-              {/* Desktop Sidebar - hidden on mobile */}
-              <div className="hidden lg:block">
-                <Sidebar />
-              </div>
-
-              {/* Main Content */}
-              <main className="flex-1 overflow-y-auto relative w-full">
-
-                {/* Background ambient glow */}
-                <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
-                  <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[100px]" />
-                  <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[100px]" />
+        <AuthProvider>
+          <MobileProvider>
+            <SidebarProvider>
+              <div className="flex h-screen overflow-hidden overflow-x-hidden bg-slate-950 text-slate-200 max-w-[100vw]">
+                {/* Desktop Sidebar - hidden on mobile */}
+                <div className="hidden lg:block">
+                  <Sidebar />
                 </div>
 
-                {/* Page Content */}
-                <div className="lg:p-4">
-                  {children}
-                </div>
-              </main>
+                {/* Main Content */}
+                <main className="flex-1 overflow-y-auto relative w-full">
 
-              {/* Mobile Bottom Tab Bar - hidden on desktop */}
-              <div className="lg:hidden">
-                <BottomTabBar />
+                  {/* Background ambient glow */}
+                  <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+                    <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[100px]" />
+                    <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[100px]" />
+                  </div>
+
+                  {/* Page Content */}
+                  <div className="lg:p-4">
+                    {children}
+                  </div>
+                </main>
+
+                {/* Mobile Bottom Tab Bar - hidden on desktop */}
+                <div className="lg:hidden">
+                  <BottomTabBar />
+                </div>
               </div>
-            </div>
-          </SidebarProvider>
-        </MobileProvider>
+            </SidebarProvider>
+          </MobileProvider>
+        </AuthProvider>
       </body>
     </html>
   );

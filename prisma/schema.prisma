@@ -11,7 +11,10 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-// Enums para mantener consistencia con nuestros tipos de TS
+// ============================================
+// ENUMS
+// ============================================
+
 enum LeadStatus {
   new
   cleaned
@@ -34,6 +37,77 @@ enum MessageSender {
   executive
   prospect
 }
+
+// Roles de usuario para autorización
+enum UserRole {
+  ADMIN
+  EXECUTIVE
+}
+
+// ============================================
+// MODELOS DE AUTENTICACIÓN (NextAuth.js)
+// ============================================
+
+model User {
+  id            String    @id @default(uuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  role          UserRole  @default(EXECUTIVE)
+  
+  // Relaciones de NextAuth
+  accounts      Account[]
+  sessions      Session[]
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(uuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ============================================
+// MODELOS DE NEGOCIO (CRM)
+// ============================================
 
 // Modelo principal de Lead
 model Lead {
@@ -65,7 +139,13 @@ model Lead {
   // Relaciones
   history       Message[] // Relación 1:N con mensajes
   
-  @@map("leads") // Nombre de la tabla en la BD
+  // Índices para optimización de queries
+  @@index([phone])
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
+  @@index([businessUnit, status])
+  
+  @@map("leads")
 }
 
 // Tabla separada para el historial de mensajes (Normalización)
@@ -79,5 +159,6 @@ model Message {
   leadId    String
   lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
   
+  @@index([leadId])
   @@map("messages")
 }
