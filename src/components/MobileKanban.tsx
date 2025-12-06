@@ -42,8 +42,11 @@ export function MobileKanban() {
     const [loading, setLoading] = useState(true);
     const [activeColumnIndex, setActiveColumnIndex] = useState(0);
     const [editingLead, setEditingLead] = useState<Lead | null>(null);
+    const [showNewLeadModal, setShowNewLeadModal] = useState(false);
     const [showStatusSelector, setShowStatusSelector] = useState<string | null>(null);
     const tabsRef = useRef<HTMLDivElement>(null);
+    const touchStartX = useRef<number>(0);
+    const touchEndX = useRef<number>(0);
 
     const fetchLeads = async () => {
         try {
@@ -114,6 +117,47 @@ export function MobileKanban() {
             console.error('Error updating lead:', error);
         }
         setEditingLead(null);
+    };
+
+    // Crear nuevo lead
+    const handleCreateLead = async (leadData: Partial<Lead>) => {
+        try {
+            const res = await fetch('/api/leads', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...leadData, status: 'new' }),
+            });
+            if (res.ok) {
+                await fetchLeads();
+                // Ir a columna "Nuevo" después de crear
+                setActiveColumnIndex(0);
+            }
+        } catch (error) {
+            console.error('Error creating lead:', error);
+        }
+        setShowNewLeadModal(false);
+    };
+
+    // Swipe handlers
+    const handleTouchStart = (e: React.TouchEvent) => {
+        touchStartX.current = e.touches[0].clientX;
+    };
+
+    const handleTouchMove = (e: React.TouchEvent) => {
+        touchEndX.current = e.touches[0].clientX;
+    };
+
+    const handleTouchEnd = () => {
+        const diff = touchStartX.current - touchEndX.current;
+        const minSwipeDistance = 50;
+
+        if (diff > minSwipeDistance) {
+            // Swipe left -> next column
+            handleNextColumn();
+        } else if (diff < -minSwipeDistance) {
+            // Swipe right -> prev column
+            handlePrevColumn();
+        }
     };
 
     // Contar leads por columna
@@ -213,8 +257,13 @@ export function MobileKanban() {
                 </button>
             </div>
 
-            {/* Lista de leads */}
-            <div className="p-4 space-y-3">
+            {/* Lista de leads con swipe detection */}
+            <div
+                className="p-4 space-y-3"
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+            >
                 {columnLeads.length > 0 ? (
                     columnLeads.map(lead => (
                         <MobileKanbanCard
@@ -243,6 +292,14 @@ export function MobileKanban() {
                 )}
             </div>
 
+            {/* FAB para agregar nuevo lead */}
+            <button
+                onClick={() => setShowNewLeadModal(true)}
+                className="fixed bottom-20 right-4 p-4 bg-blue-600 text-white rounded-full shadow-lg shadow-blue-600/30 active:bg-blue-500 active:scale-95 z-30 transition-transform"
+            >
+                <Plus className="h-6 w-6" />
+            </button>
+
             {/* Modal de edición */}
             <AddLeadModal
                 isOpen={!!editingLead}
@@ -250,7 +307,15 @@ export function MobileKanban() {
                 onSave={handleSaveEdit}
                 initialData={editingLead}
             />
-        </PullToRefresh >
+
+            {/* Modal de nuevo lead */}
+            <AddLeadModal
+                isOpen={showNewLeadModal}
+                onClose={() => setShowNewLeadModal(false)}
+                onSave={handleCreateLead}
+                initialData={null}
+            />
+        </PullToRefresh>
     );
 }
 
