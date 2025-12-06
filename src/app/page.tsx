@@ -22,12 +22,15 @@ import clsx from 'clsx';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { AddLeadModal } from '@/components/AddLeadModal';
+import { useMobile } from '@/components/MobileProvider';
+import { MobileDashboard } from '@/components/MobileDashboard';
 
 export default function Dashboard() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+  const { isMobile } = useMobile();
 
   useEffect(() => {
     fetch('/api/leads')
@@ -66,6 +69,11 @@ export default function Dashboard() {
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
       </div>
     );
+  }
+
+  // Mostrar dashboard móvil en pantallas pequeñas
+  if (isMobile) {
+    return <MobileDashboard leads={leads} />;
   }
 
   // --- Metrics Calculation ---
