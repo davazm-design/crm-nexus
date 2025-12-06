@@ -228,34 +228,58 @@ export function MobileKanban() {
                     onClick={handlePrevColumn}
                     disabled={activeColumnIndex === 0}
                     className={clsx(
-                        "p-2 rounded-lg transition-colors",
+                        "p-2 rounded-lg transition-all",
                         activeColumnIndex === 0
                             ? "text-slate-700"
-                            : "text-slate-400 active:bg-white/10"
+                            : "text-slate-400 active:bg-white/10 active:scale-90"
                     )}
                 >
                     <ChevronLeft className="h-5 w-5" />
                 </button>
 
-                <div className="flex items-center gap-2">
-                    <div className={clsx("h-3 w-3 rounded-full", activeColumn.color)} />
-                    <span className="text-sm font-semibold text-white">{activeColumn.label}</span>
-                    <span className="text-xs text-slate-500">({columnLeads.length})</span>
+                <div className="flex flex-col items-center">
+                    <div className="flex items-center gap-2">
+                        <div className={clsx("h-3 w-3 rounded-full transition-colors", activeColumn.color)} />
+                        <span className="text-sm font-semibold text-white">{activeColumn.label}</span>
+                        <span className="text-xs text-slate-500">({columnLeads.length})</span>
+                    </div>
+                    {/* Indicador de posición (dots) */}
+                    <div className="flex gap-1 mt-1.5">
+                        {COLUMNS.map((col, i) => (
+                            <button
+                                key={col.id}
+                                onClick={() => setActiveColumnIndex(i)}
+                                className={clsx(
+                                    "h-1.5 rounded-full transition-all",
+                                    i === activeColumnIndex
+                                        ? "w-4 bg-blue-500"
+                                        : "w-1.5 bg-slate-700 active:bg-slate-500"
+                                )}
+                            />
+                        ))}
+                    </div>
                 </div>
 
                 <button
                     onClick={handleNextColumn}
                     disabled={activeColumnIndex === COLUMNS.length - 1}
                     className={clsx(
-                        "p-2 rounded-lg transition-colors",
+                        "p-2 rounded-lg transition-all",
                         activeColumnIndex === COLUMNS.length - 1
                             ? "text-slate-700"
-                            : "text-slate-400 active:bg-white/10"
+                            : "text-slate-400 active:bg-white/10 active:scale-90"
                     )}
                 >
                     <ChevronRight className="h-5 w-5" />
                 </button>
             </div>
+
+            {/* Hint de swipe (solo visible si hay más de 1 columna con leads) */}
+            {activeColumnIndex === 0 && leads.length > 0 && (
+                <div className="text-center py-2 text-[10px] text-slate-600">
+                    ← Desliza para cambiar de columna →
+                </div>
+            )}
 
             {/* Lista de leads con swipe detection */}
             <div
