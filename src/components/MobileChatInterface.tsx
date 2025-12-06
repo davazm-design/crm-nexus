@@ -6,6 +6,7 @@ import { Send, Phone, PhoneCall, Search, ArrowLeft, MessageCircle, User } from '
 import clsx from 'clsx';
 import { format } from 'date-fns';
 import { AddLeadModal } from './AddLeadModal';
+import { PullToRefresh } from './PullToRefresh';
 
 export function MobileChatInterface() {
     const [leads, setLeads] = useState<Lead[]>([]);
@@ -107,10 +108,18 @@ export function MobileChatInterface() {
         setSending(false);
     };
 
+    const refreshLeads = async () => {
+        const res = await fetch('/api/leads');
+        if (res.ok) {
+            const data = await res.json();
+            setLeads(data);
+        }
+    };
+
     // Vista de lista de chats
     if (!selectedLead) {
         return (
-            <div className="min-h-screen bg-slate-950 pb-20">
+            <PullToRefresh onRefresh={refreshLeads} className="min-h-screen bg-slate-950 pb-20">
                 {/* Header */}
                 <div className="sticky top-0 bg-slate-950/95 backdrop-blur-lg z-10 p-4 border-b border-white/5">
                     <h1 className="text-lg font-bold text-white">Chats</h1>
@@ -180,7 +189,7 @@ export function MobileChatInterface() {
                         </div>
                     )}
                 </div>
-            </div>
+            </PullToRefresh>
         );
     }
 

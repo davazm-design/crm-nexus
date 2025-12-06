@@ -8,14 +8,16 @@ import { MessageCircle, Users, Calendar, TrendingUp, ChevronRight, Phone, X, Arr
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import clsx from 'clsx';
+import { PullToRefresh } from './PullToRefresh';
 
 interface MobileDashboardProps {
     leads: Lead[];
+    onRefresh?: () => Promise<void>;
 }
 
 type FilterType = 'new' | 'unread' | 'progress' | 'scheduled' | null;
 
-export function MobileDashboard({ leads }: MobileDashboardProps) {
+export function MobileDashboard({ leads, onRefresh }: MobileDashboardProps) {
     const [activeFilter, setActiveFilter] = useState<FilterType>(null);
 
     // Calcular stats
@@ -113,8 +115,14 @@ export function MobileDashboard({ leads }: MobileDashboardProps) {
     }
 
     // Vista principal del dashboard
+    const handleRefresh = async () => {
+        if (onRefresh) {
+            await onRefresh();
+        }
+    };
+
     return (
-        <div className="min-h-screen bg-slate-950 pb-20 px-4">
+        <PullToRefresh onRefresh={handleRefresh} className="min-h-screen bg-slate-950 pb-20 px-4">
             {/* Header */}
             <div className="pt-4 pb-2">
                 <div className="flex items-center gap-3 mb-3">
@@ -263,6 +271,6 @@ export function MobileDashboard({ leads }: MobileDashboardProps) {
                     )}
                 </div>
             </div>
-        </div>
+        </PullToRefresh>
     );
 }

@@ -63,6 +63,12 @@ export default function Dashboard() {
     setSelectedLead(null);
   };
 
+  const refreshLeads = async () => {
+    const res = await fetch('/api/leads');
+    const data = await res.json();
+    setLeads(data);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -73,7 +79,7 @@ export default function Dashboard() {
 
   // Mostrar dashboard móvil en pantallas pequeñas
   if (isMobile) {
-    return <MobileDashboard leads={leads} />;
+    return <MobileDashboard leads={leads} onRefresh={refreshLeads} />;
   }
 
   // --- Metrics Calculation ---
