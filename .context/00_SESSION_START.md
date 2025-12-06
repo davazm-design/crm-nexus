@@ -13,11 +13,12 @@
 Antes de responder a cualquier solicitud de código, debes ejecutar secuencialmente los siguientes pasos mentales y operativos:
 
 ### 1. Reconocimiento del Terreno
-Lee y analiza los siguientes archivos de contexto (si están disponibles en tu entorno):
-*   `.context/CODING_STANDARDS.md` (Para entender las reglas de juego).
-*   `.context/TECH_STACK.md` (Para conocer las herramientas permitidas).
-*   `.context/CURRENT_STATE.md` (Para saber dónde nos quedamos).
-*   `.context/AUDIT_HOLISTIC.md` (Para ver issues pendientes y puntuación de calidad).
+Lee y analiza los siguientes archivos de contexto en este orden:
+*   `.context/INDEX.md` (Índice y orden de lectura recomendado).
+*   `.context/04_CURRENT_STATE.md` (Para saber dónde nos quedamos).
+*   `.context/05_AUDIT_HOLISTIC.md` (Para ver issues pendientes y puntuación de calidad).
+*   `.context/03_CODING_STANDARDS.md` (Para entender las reglas de juego).
+*   `.context/02_TECH_STACK.md` (Para conocer las herramientas permitidas).
 *   `README.md` (Para la visión general del producto).
 
 ### 2. Verificación de Integridad
